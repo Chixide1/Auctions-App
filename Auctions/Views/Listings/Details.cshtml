@@ -47,7 +47,7 @@
                         Bid: $ <input type="number" min="@Model.Price" step="1" name="Price" placeholder="@Model.Price.ToString("N2")" />
                         <input type="hidden" name="IdentityUserId" class="form-control" value="@userManager.GetUserId(User)" />
                         <input type="hidden" name="ListingId" class="form-control" value="@Model.Id" />
-                        <input type="submit" class="btn-primary" />
+                        <input type="submit" class=" btn btn-primary" />
                     </div>
                 </form>
                 <p>Bids submitted: @Model.Bids.Count</p>
@@ -99,7 +99,7 @@
             <textarea class="form-control" aria-label="with textarea" name="Content" style="width: 40%; vertical-align: top;"></textarea>
             <input type="hidden" name="IdentityUserId" class="form-control" value="@userManager.GetUserId(User)" />
             <input type="hidden" name="ListingId" class="form-control" value="@Model.Id" />
-            <input type="submit" class="btn-primary" style="display: inline-block; margin-top: 10px;" />
+            <input type="submit" class="btn btn-primary" style="display: inline-block; margin-top: 10px;" />
         </form>
     </div>
 }
@@ -109,7 +109,7 @@ else
         <form asp-action="AddComment" method="post">
             <h6>Add Comment</h6>
             <textarea class="form-control" aria-label="with textarea" name="Content" style="width: 40%; vertical-align: top;"></textarea>
-            <input disabled type="submit" class="btn-primary" style="display: inline-block; margin-top: 10px;" />
+            <input disabled type="submit" class="btn btn-primary" style="display: inline-block; margin-top: 10px;" />
         </form>
     </div>
 }
