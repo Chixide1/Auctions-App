@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Auctions.Data;
 using Auctions.Models;
 using Auctions.Data.Services;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Auctions.Controllers
 {
@@ -15,11 +16,13 @@ namespace Auctions.Controllers
     {
         private readonly IListingsService _listingsService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IBidsService _bidsService;
 
-        public ListingsController(IListingsService listingsService, IWebHostEnvironment webHostEnvironment)
+        public ListingsController(IListingsService listingsService, IWebHostEnvironment webHostEnvironment, IBidsService bidsService)
         {
             _listingsService = listingsService;
             _webHostEnvironment = webHostEnvironment;
+            _bidsService = bidsService;
         }
 
         // GET: Listings
@@ -36,7 +39,7 @@ namespace Auctions.Controllers
                 return View(await PaginatedList<Listing>.CreateAsync(applicationDbContext.Where(l => l.IsSold == false).AsNoTracking(), pageNumber ?? 1, pageSize));
             }
 
-            return View(await PaginatedList<Listing>.CreateAsync(applicationDbContext.Where(l => l.IsSold ==  false).AsNoTracking(), pageNumber ?? 1, pageSize));
+            return View(await PaginatedList<Listing>.CreateAsync(applicationDbContext.Where(l => l.IsSold == false).AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         // GET: Listings/Details/5
@@ -60,7 +63,7 @@ namespace Auctions.Controllers
         // GET: Listings/Create
         public IActionResult Create()
         {
-            
+
             return View();
         }
 
@@ -71,7 +74,7 @@ namespace Auctions.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ListingVM listing)
         {
-            if(listing.Image != null)
+            if (listing.Image != null)
             {
                 string uploadDir = Path.Combine(_webHostEnvironment.WebRootPath, "Images");
                 string fileName = listing.Image.FileName;
@@ -96,6 +99,29 @@ namespace Auctions.Controllers
             }
 
             return View(listing);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AddBid([Bind("Id, Price, ListingId, IdentityUserId")] Bid bid)
+        {
+            if (ModelState.IsValid)
+            {
+                await _bidsService.Add(bid);
+            }
+
+            var listing = await _listingsService.GetById(bid.ListingId);
+            listing.Price = bid.Price;
+            await _listingsService.SaveChanges();
+
+            return View("Details", listing);
+        }
+
+        public async Task<ActionResult> CloseBidding(int id)
+        {
+            var listing = await _listingsService.GetById(id);
+            listing.IsSold = true;
+            await _listingsService.SaveChanges();
+            return View("Details", listing);
         }
 
         //// GET: Listings/Edit/5
